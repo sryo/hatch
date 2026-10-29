@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { gzipSync } from 'node:zlib';
 import { readFileSync } from 'node:fs';
-import { GLYPHS, url, css } from './hatch.js';
+import { GLYPHS, url, css } from '../hatch.js';
 import { raster } from './raster.mjs';
 
 // Budgets: optimize to meet them, don't raise them.
@@ -38,7 +38,7 @@ test('rasterizing is fast', () => {
 test('the shipped scripts stay small', () => {
   // Comments ship with the source, so they keep to what the code can't say.
   for (const [f, max] of [['hatch.js', 5050], ['shade.js', 3050]]) {
-    const n = readFileSync(new URL(f, import.meta.url)).length;
+    const n = readFileSync(new URL(`../${f}`, import.meta.url)).length;
     assert.ok(n <= max, `${f}: ${n} B`);
   }
 });

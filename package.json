@@ -9,10 +9,9 @@
     "./hatch.css": "./hatch.css",
     "./package.json": "./package.json"
   },
-  "files": ["hatch.js", "shade.js", "hatch.css"],
   "scripts": {
     "build": "node build.mjs",
-    "test": "node --test"
+    "test": "node --test test/*.test.mjs"
   },
   "license": "SEE LICENSE IN LICENSE"
 }
