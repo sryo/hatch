@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>hatch</title>
+<link rel="stylesheet" href="hatch.css">
+<style>
+:root{--canvas:#FAF9F6;--tile:#FFFFFF;--line:#E7E4DD;--ink:#1A1D2E;--muted:#5F6275;--a:30%;color-scheme:light;
+  --blue:#2F5BEA;--green:#12974A;--red:#D7263D;--orange:#E8890C;--purple:#8452F2;--hue:var(--blue)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--canvas:#0E0F13;--tile:#1D1F27;--line:#2C2F3A;--ink:#EDEEF3;--muted:#A3A6B6;--a:38%;color-scheme:dark;
+  --blue:#6B8CFF;--green:#3DDC84;--red:#FF5C6B;--orange:#FFA94D;--purple:#A585FF}}
+:root[data-theme="dark"]{--canvas:#0E0F13;--tile:#1D1F27;--line:#2C2F3A;--ink:#EDEEF3;--muted:#A3A6B6;--a:38%;color-scheme:dark;
+  --blue:#6B8CFF;--green:#3DDC84;--red:#FF5C6B;--orange:#FFA94D;--purple:#A585FF}
+*{box-sizing:border-box}
+body{margin:0;background:var(--canvas);color:var(--ink);font:15px/1.45 system-ui,-apple-system,sans-serif}
+main{max-width:760px;margin:0 auto;padding:32px 16px 64px;display:flex;flex-direction:column;gap:16px}
+h1{font-size:28px;margin:0;letter-spacing:-.02em}
+p{margin:0;color:var(--muted);text-wrap:balance}
+code{font:12px ui-monospace,monospace}
+.card{background:var(--tile);border-radius:12px;box-shadow:0 0 0 1px var(--line);padding:20px;display:flex;flex-direction:column;gap:12px}
+
+.bar{position:sticky;top:0;z-index:2;background:var(--canvas);padding:8px 0;display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px}
+.seg{flex-wrap:wrap;max-width:100%}
+.seg{display:inline-flex;background:var(--tile);box-shadow:inset 0 0 0 1px var(--line);border-radius:999px;padding:3px}
+.seg button{all:unset;padding:3px 10px;border-radius:999px;cursor:pointer;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--tile)}
+.seg button:focus-visible{outline:2px solid var(--hue);outline-offset:2px}
+@media (pointer:coarse){.seg button{padding:8px 12px}}
+#seen{display:flex;flex-direction:column;gap:16px}
+
+.solid{background:var(--hue);--hatch-on:var(--hue)}
+.faded{background:color-mix(in srgb,var(--hue) var(--a),transparent);--hatch-on:color-mix(in srgb,var(--hue) var(--a),var(--tile))}
+
+.weights{display:grid;grid-template-columns:72px repeat(7,minmax(0,1fr));gap:4px;align-items:center;font-size:12px;color:var(--muted)}
+.weights>span{text-align:center}.weights>span:first-child{text-align:left}
+.weights i{height:32px;border-radius:4px}
+
+.strip{display:flex;gap:3px;height:40px;border-radius:8px;overflow:hidden}
+.keys{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:13px}
+.keys span{white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.keys .hatch-key{width:20px;height:20px}
+.plain,.plain *{--hatch-a:0!important}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <filter id="protan" color-interpolation-filters="linearRGB"><feColorMatrix values="0.152286 1.052583 -0.204868 0 0  0.114503 0.786281 0.099216 0 0  -0.003882 -0.048116 1.051998 0 0  0 0 0 1 0"/></filter>
+  <filter id="deutan" color-interpolation-filters="linearRGB"><feColorMatrix values="0.367322 0.860646 -0.227968 0 0  0.280085 0.672501 0.047413 0 0  -0.011820 0.042940 0.968881 0 0  0 0 0 1 0"/></filter>
+  <filter id="tritan" color-interpolation-filters="linearRGB"><feColorMatrix values="1.255528 -0.076749 -0.178779 0 0  -0.078411 0.930809 0.147602 0 0  0.004733 0.691367 0.303900 0 0  0 0 0 1 0"/></filter>
+  <filter id="gray" color-interpolation-filters="linearRGB"><feColorMatrix type="saturate" values="0"/></filter>
+</svg>
+<main>
+  <header>
+    <h1>hatch</h1>
+    <p>Textures and shades for anything with a fill.</p>
+  </header>
+
+  <div class="bar">
+    <div class="seg" role="group" aria-label="Theme" id="theme">
+      <button type="button" data-t="" aria-pressed="true">Auto</button>
+      <button type="button" data-t="light" aria-pressed="false">Light</button>
+      <button type="button" data-t="dark" aria-pressed="false">Dark</button>
+    </div>
+    <div class="seg" role="group" aria-label="Color vision" id="vision">
+      <button type="button" data-v="" aria-pressed="true">Normal</button>
+      <button type="button" data-v="deutan" aria-pressed="false">Deutan</button>
+      <button type="button" data-v="protan" aria-pressed="false">Protan</button>
+      <button type="button" data-v="tritan" aria-pressed="false">Tritan</button>
+      <button type="button" data-v="gray" aria-pressed="false">Gray</button>
+    </div>
+    <div class="seg" role="group" aria-label="Fill" id="textures">
+      <button type="button" data-x="on" aria-pressed="true">Textures</button>
+      <button type="button" data-x="off" aria-pressed="false">Color only</button>
+    </div>
+  </div>
+
+  <div id="seen">
+    <section class="card"><div class="weights" id="weights"></div></section>
+    <section class="card">
+      <div class="strip" id="strip" aria-hidden="true"></div>
+      <div class="keys" id="keys"></div>
+    </section>
+  </div>
+</main>
+<script type="module">
+import { GLYPHS, keyed, url } from './hatch.js';
+import { shade, ramp } from './shade.js';
+
+const shadeStyle = (g, w) => `style="--hatch-g:${url(shade(g, w)).replaceAll('"', '&quot;')}"`;
+
+const steps = ramp(7, { from: .1, to: .9 });
+document.getElementById('weights').innerHTML = '<span>cover</span>' + steps.map(w => `<span>${Math.round(w * 100)}%</span>`).join('')
+  + GLYPHS.map(g => `<code>${g.name}</code>` + steps.map(w => `<i class="faded hatch" ${shadeStyle(g.name, w)}></i>`).join('')).join('');
+
+const rows = [['Search', 34, 'blue'], ['Direct', 24, 'green'], ['Social', 20, 'red'], ['Email', 14, 'orange'], ['Ads', 8, 'purple']], pick = keyed();
+const mark = ([l, , hue], cls = '', style = '') => `<i class="${cls}solid hatch-${pick(l)}" style="--hue:var(--${hue})${style}"></i>`;
+document.getElementById('strip').innerHTML = rows.map(r => mark(r, '', `;flex:${r[1]}`)).join('');
+document.getElementById('keys').innerHTML = rows.map(r => `<span>${mark(r, 'hatch-key ')}${r[0]} ${r[1]}%</span>`).join('');
+
+const press = (group, btn) => group.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === btn));
+document.getElementById('theme').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  press(e.currentTarget, b);
+  if (b.dataset.t) document.documentElement.dataset.theme = b.dataset.t; else delete document.documentElement.dataset.theme;
+};
+document.getElementById('textures').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  press(e.currentTarget, b);
+  document.getElementById('seen').classList.toggle('plain', b.dataset.x === 'off');
+};
+document.getElementById('vision').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  press(e.currentTarget, b);
+  document.getElementById('seen').style.filter = b.dataset.v ? `url(#${b.dataset.v})` : '';
+};
+</script>
+</body>
+</html>
